@@ -1,0 +1,16 @@
+#+TITLE: README
+#+AUTHOR: lujun9972
+#+CATEGORY: org-eww
+#+DATE: [2015-12-27 日 10:53]
+#+OPTIONS: ^:{}
+
+* What is org-eww
+org-eww is a little tool that automatically use eww to preview current org-file when save
+
+* Usage
+Just execute the command `org-eww-turn-on-preview-at-save', then everytime current org-file saved, a eww buffer will show the exported html file.
+
+Use the command `org-eww-turn-off-preview-at-save' to turn off this feature.
+
+* Customization
+`org-eww-output-file-name' which default value is "preview-result.html" sepcify the temporary file generated when preview.
