@@ -73,16 +73,19 @@ If BUFFER-OR-NAME did not exist, return DEFAULT-POINT"
 	  (goto-char eww-point))
     (org-eww--select-or-create-buffer-window cb)))
 
+;;;###autoload
 (defun org-eww ()
   "Export current org-mode buffer to `org-eww-output-file-name', and call `eww-open-file' to preview it"
   (interactive)
   (org-eww-convert org-eww-output-file-name))
 
+;;;###autoload
 (defun org-eww-turn-on-preview-at-save ()
   "turn on automatically preview current org-file when save"
   (interactive)
   (add-hook 'after-save-hook #'org-eww nil t))
 
+;;;###autoload
 (defun org-eww-turn-off-preview-at-save ()
   "turn off automatically preview current org-file when save"
   (interactive)
