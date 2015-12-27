@@ -41,7 +41,7 @@
 (require 'org)
 (require 'eww)
 
-(defvar org-eww-output-file-name "realtime-preview-result.html"
+(defvar org-eww-output-file-name "preview-result.html"
   "temporary file generated when preview")
 
 (defun org-eww--select-or-create-buffer-window (buffer-or-name)
