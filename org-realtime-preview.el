@@ -36,12 +36,12 @@
   (interactive)
   (org-preview-convert org-preview-output-file-name))
 
-(defun turn-on-org-preview ()
+(defun org-preview-turn-on-preview-at-save ()
   "开启保存后自动预览"
   (interactive)
   (add-hook 'after-save-hook #'org-preview nil t))
 
-(defun turn-off-org-preview ()
+(defun org-preview-turn-off-preview-at-save ()
   "关闭保存后自动预览"
   (interactive)
   (remove-hook 'after-save-hook #'org-preview t))
