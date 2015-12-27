@@ -7,6 +7,7 @@
 ;; Version: 0.1
 ;; Keywords: convenience, eww, org
 ;; Package-Requires: ((org "8.0") (eww))
+;; URL: https://github.com/lujun9972/org-eww
 
 ;; This file is NOT part of GNU Emacs.
 
