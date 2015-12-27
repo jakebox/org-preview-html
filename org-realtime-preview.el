@@ -1,3 +1,43 @@
+;;; org-preview.el --- automatically use eww to preview current org-file when save
+
+;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
+
+;; Author: DarkSun <lujun9972@gmail.com>
+;; Created: 2015-12-27
+;; Version: 0.1
+;; Keywords: convenience, eww, org
+;; Package-Requires: ((org "8.0") (eww))
+
+;; This file is NOT part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Source code
+;;
+;; org-preview's code can be found here:
+;;   http://github.com/lujun9972/org-preview
+
+;;; Commentary:
+
+;; org-preview is a little tool that use eww to preview current org-file when save automatically 
+
+;; Quick start:
+
+;; execute the following commands:
+;; `org-preview-turn-on-preview-at-save'
+
+;;; Code:
 (require 'org)
 (require 'eww)
 
@@ -48,3 +88,5 @@ If BUFFER-OR-NAME did not exist, return DEFAULT-POINT"
   (remove-hook 'after-save-hook #'org-preview t))
 
 (provide 'org-preview)
+
+;;; org-preview.el ends here
