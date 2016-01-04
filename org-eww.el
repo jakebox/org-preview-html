@@ -46,7 +46,7 @@
   "Export current org-mode buffer to OUTPUT-FILE-NAME, and call `eww-open-file' to preview it"
   (let ((cb (current-buffer)))
     (save-excursion
-      (with-selected-window (display-buffer "*eww*")
+      (with-selected-window (display-buffer (get-buffer-create "*eww*"))
         (let ((eww-point (point))
               (eww-window-start (window-start)))
           (with-current-buffer cb
