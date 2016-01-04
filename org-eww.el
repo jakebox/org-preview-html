@@ -42,15 +42,6 @@
 (require 'org)
 (require 'eww)
 
-(defun org-eww--buffer-point(buffer-or-name &optional default-point)
-  "Get the point position in specify buffer
-
-If BUFFER-OR-NAME did not exist, return DEFAULT-POINT"
-  (if (get-buffer buffer-or-name)
-	  (with-current-buffer buffer-or-name
-		(point))
-	default-point))
-
 (defun org-eww-convert (output-file-name)
   "Export current org-mode buffer to OUTPUT-FILE-NAME, and call `eww-open-file' to preview it"
   (let ((cb (current-buffer)))
