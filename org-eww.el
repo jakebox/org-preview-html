@@ -45,14 +45,6 @@
 (defvar org-eww-output-file-name "preview-result.html"
   "temporary file generated when preview")
 
-(defun org-eww--select-or-create-buffer-window (buffer-or-name)
-  "If any window in currect frame displaying BUFFER-OR-NAME ,then select the window, otherwise,create a new window to display it"
-  (let ((buf (get-buffer-create buffer-or-name)))
-	(unless (get-buffer-window buf)
-	  (split-window)
-	  (switch-to-buffer buf))
-	(select-window (get-buffer-window buf))))
-
 (defun org-eww--buffer-point(buffer-or-name &optional default-point)
   "Get the point position in specify buffer
 
@@ -64,14 +56,13 @@ If BUFFER-OR-NAME did not exist, return DEFAULT-POINT"
 
 (defun org-eww-convert (output-file-name)
   "Export current org-mode buffer to OUTPUT-FILE-NAME, and call `eww-open-file' to preview it"
-  (let ((cb (current-buffer))
-		(eww-point (org-eww--buffer-point "*eww*" 1)))
+  (let ((cb (current-buffer)))
     (save-excursion
-	  (org-eww--select-or-create-buffer-window "*eww*")
-	  (with-current-buffer cb
-		(org-export-to-file 'html output-file-name nil nil nil nil nil #'eww-open-file))
-	  (goto-char eww-point))
-    (org-eww--select-or-create-buffer-window cb)))
+      (with-selected-window (display-buffer "*eww*")
+        (let ((eww-point (point)))
+          (with-current-buffer cb
+            (org-export-to-file 'html output-file-name nil nil nil nil nil #'eww-open-file))
+          (goto-char eww-point))))))
 
 ;;;###autoload
 (defun org-eww ()
