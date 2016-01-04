@@ -36,13 +36,13 @@
 ;; Quick start:
 
 ;; execute the following commands:
-;; `org-eww-turn-on-preview-at-save'
+;; `org-eww/turn-on-preview-at-save'
 
 ;;; Code:
 (require 'org)
 (require 'eww)
 
-(defun org-eww-convert (output-file-name)
+(defun org-eww/convert (output-file-name)
   "Export current org-mode buffer to OUTPUT-FILE-NAME, and call `eww-open-file' to preview it"
   (let ((cb (current-buffer)))
     (save-excursion
@@ -58,16 +58,16 @@
 (defun org-eww ()
   "Export current org-mode buffer to a temp file and call `eww-open-file' to preview it"
   (interactive)
-  (org-eww-convert (make-temp-file (file-name-base buffer-file-name) nil ".html")))
+  (org-eww/convert (make-temp-file (file-name-base buffer-file-name) nil ".html")))
 
 ;;;###autoload
-(defun org-eww-turn-on-preview-at-save ()
+(defun org-eww/turn-on-preview-at-save ()
   "turn on automatically preview current org-file when save"
   (interactive)
   (add-hook 'after-save-hook #'org-eww nil t))
 
 ;;;###autoload
-(defun org-eww-turn-off-preview-at-save ()
+(defun org-eww/turn-off-preview-at-save ()
   "turn off automatically preview current org-file when save"
   (interactive)
   (remove-hook 'after-save-hook #'org-eww t))
