@@ -42,9 +42,6 @@
 (require 'org)
 (require 'eww)
 
-(defvar org-eww-output-file-name "preview-result.html"
-  "temporary file generated when preview")
-
 (defun org-eww--buffer-point(buffer-or-name &optional default-point)
   "Get the point position in specify buffer
 
@@ -59,16 +56,18 @@ If BUFFER-OR-NAME did not exist, return DEFAULT-POINT"
   (let ((cb (current-buffer)))
     (save-excursion
       (with-selected-window (display-buffer "*eww*")
-        (let ((eww-point (point)))
+        (let ((eww-point (point))
+              (eww-window-start (window-start)))
           (with-current-buffer cb
             (org-export-to-file 'html output-file-name nil nil nil nil nil #'eww-open-file))
-          (goto-char eww-point))))))
+          (goto-char eww-point)
+          (set-window-start nil eww-window-start))))))
 
 ;;;###autoload
 (defun org-eww ()
-  "Export current org-mode buffer to `org-eww-output-file-name', and call `eww-open-file' to preview it"
+  "Export current org-mode buffer to a temp file and call `eww-open-file' to preview it"
   (interactive)
-  (org-eww-convert org-eww-output-file-name))
+  (org-eww-convert (make-temp-file (file-name-base buffer-file-name) nil ".html")))
 
 ;;;###autoload
 (defun org-eww-turn-on-preview-at-save ()
