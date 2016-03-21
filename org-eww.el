@@ -35,8 +35,9 @@
 
 ;; Quick start:
 
-;; execute the following commands:
-;; `org-eww/turn-on-preview-at-save'
+;; Put this file under your load-path.
+;; Insert the following line in your `.emacs':
+;; (add-hook 'org-mode-hook 'org-eww-mode)
 
 ;;; Code:
 (require 'org)
@@ -64,14 +65,27 @@
 (defun org-eww/turn-on-preview-at-save ()
   "turn on automatically preview current org-file when save"
   (interactive)
-  (add-hook 'after-save-hook #'org-eww nil t))
+  (progn
+    (add-hook 'after-save-hook #'org-eww nil t)
+    (message "Preview is on.")))
 
 ;;;###autoload
 (defun org-eww/turn-off-preview-at-save ()
   "turn off automatically preview current org-file when save"
   (interactive)
-  (remove-hook 'after-save-hook #'org-eww t))
+  (progn
+    (remove-hook 'after-save-hook #'org-eww t)
+    (message "Preview is off.")))
 
-(provide 'org-eww)
+;;;###autoload
+(define-minor-mode org-eww-mode
+  "Preview current org file in eww whenever you save it."
+  :lighter "preview"
+  :keymap (let ((map (make-sparse-keymap)))
+	    (define-key map (kbd "C-c M-p") 'org-eww/turn-on-preview-at-save)
+	    (define-key map (kbd "C-c M-P") 'org-eww/turn-off-preview-at-save)
+	    map))
+
+(provide 'org-eww-mode)
 
 ;;; org-eww.el ends here
