@@ -80,7 +80,7 @@
 ;;;###autoload
 (define-minor-mode org-eww-mode
   "Preview current org file in eww whenever you save it."
-  :lighter "preview"
+  :lighter " preview"
   :keymap (let ((map (make-sparse-keymap)))
 	    (define-key map (kbd "C-c M-p") 'org-eww/turn-on-preview-at-save)
 	    (define-key map (kbd "C-c M-P") 'org-eww/turn-off-preview-at-save)
