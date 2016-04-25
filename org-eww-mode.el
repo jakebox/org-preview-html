@@ -1,6 +1,6 @@
 ;;; org-eww.el --- automatically use eww to preview current org-file when save
 
-;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
+;; Copyright (C) 2004-2015 DarkSun <lujun9972@gmail.com>
 
 ;; Author: DarkSun <lujun9972@gmail.com>
 ;; Created: 2015-12-27
