@@ -86,6 +86,6 @@
 	    (define-key map (kbd "C-c M-P") 'org-eww/turn-off-preview-at-save)
 	    map))
 
-(provide 'org-eww-mode)
+(provide 'org-eww)
 
 ;;; org-eww.el ends here
