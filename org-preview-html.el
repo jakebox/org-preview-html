@@ -45,6 +45,9 @@
 (require 'org)
 (require 'eww)
 
+(defvar-local org-preview-html/htmlfilename nil
+  "The temp exported html file")
+
 (defun org-preview-html/preview ()
   "Export current org-mode buffer to a temp file and call `eww-open-file' to preview it."
   (let ((cb (current-buffer)))
@@ -61,8 +64,9 @@
   "Turn on automatic preview of the current org file on save."
   (progn
     (add-hook 'after-save-hook #'org-preview-html/preview nil t)
+    (add-hook 'kill-buffer-hook #'org-preview-html/turn-off-preview-on-save nil t)
     ;; temp filename into a buffer local variable
-    (setq-local org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html"))
+    (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html"))
     ;; bogus file change to be able to save
     (insert " ")
     (delete-backward-char 1)
@@ -74,15 +78,17 @@
   "Turn off automatic preview of the current org file on save."
   (progn
     (remove-hook 'after-save-hook #'org-preview-html/preview t)
+    (remove-hook 'kill-buffer-hook #'org-preview-html/turn-off-preview-on-save t)
     (if (get-buffer "*eww*")
         (kill-buffer "*eww*"))
-    (if (boundp 'org-preview-html/htmlfilename) (delete-file org-preview-html/htmlfilename))
+    (if (and (boundp 'org-preview-html/htmlfilename)
+             org-preview-html/htmlfilename) (delete-file org-preview-html/htmlfilename))
     (message "Eww preview is off")))
 
 ;;;###autoload
 (define-minor-mode org-preview-html-mode
   "Preview current org file in eww whenever you save it."
-  :init-value nil
+  :init-value t
   :lighter " eww-prev"
   (if org-preview-html-mode
       (org-preview-html/turn-off-preview-on-save)

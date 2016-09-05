@@ -18,5 +18,4 @@ Insert the following into your '.emacs' file:
 (add-hook 'org-mode-hook 'org-preview-html-mode)
 #+END_SRC
 
-Then everytime org-file saved, an eww buffer will show the exported html file.
-
+Then everytime org-file saved, an eww buffer will show the exported html.
