@@ -4,21 +4,19 @@
 #+DATE: [2015-12-27 日 10:53]
 #+OPTIONS: ^:{}
 
-* What is org-eww-mode
+* What is org-preview-html-mode
 
-org-eww-mode is a minor mode for Org-Mode that automatically use eww to preview current org-file when save.
+org-preview-html-mode is a minor mode for Org-Mode that automatically use eww to preview current org-file on save.
 
-[[file:org-eww.gif]]
+[[file:org-preview-html.gif]]
 
 * Usage
 
 Insert the following into your '.emacs' file:
 
 #+BEGIN_SRC elisp
-(add-hook 'org-mode-hook 'org-eww-mode)
+(add-hook 'org-mode-hook 'org-preview-html-mode)
 #+END_SRC
 
-On opening Org-Mode file, press 'C-c M-p' to turn on preview at save, then everytime current org-file saved, an eww buffer will show the exported html file. 'C-c M-P' to turn off.
-
-Alternatively, execute the command `org-eww-turn-on-preview-at-save' to turn on this feature, and use the command `org-eww-turn-off-preview-at-save' to turn off.
+Then everytime org-file saved, an eww buffer will show the exported html file.
 

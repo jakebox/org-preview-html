@@ -1,4 +1,4 @@
-;;; org-eww.el --- automatically use eww to preview the current org file on save
+;;; org-preview-html.el --- automatically use eww to preview the current org file on save
 
 ;; Copyright (C) 2004-2016 DarkSun <lujun9972@gmail.com>
 
@@ -7,7 +7,7 @@
 ;; Version: 0.2
 ;; Keywords: convenience, eww, org
 ;; Package-Requires: ((org "8.0") (emacs "24.4"))
-;; URL: https://github.com/lujun9972/org-eww
+;; URL: https://github.com/lujun9972/org-preview-html
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -26,26 +26,26 @@
 
 ;;; Source code
 ;;
-;; org-eww's code can be found here:
-;;   http://github.com/lujun9972/org-eww
+;; org-preview-html's code can be found here:
+;;   http://github.com/lujun9972/org-preview-html
 
 ;;; Commentary:
 
-;; org-eww is a little tool that uses eww to automatically preview an
+;; org-preview-html is a little tool that uses eww to automatically preview an
 ;; org-file on save.
 
 ;; Quick start:
 
 ;; Put this file under your load-path.
 ;; Insert the following line in your `.emacs':
-;; (add-hook 'org-mode-hook 'org-eww-mode)
-;; Enable the org-eww-mode in your org buffer.
+;; (add-hook 'org-mode-hook 'org-preview-html-mode)
+;; Enable the org-preview-html-mode in your org buffer.
 
 ;;; Code:
 (require 'org)
 (require 'eww)
 
-(defun org-eww/preview ()
+(defun org-preview-html/preview ()
   "Export current org-mode buffer to a temp file and call `eww-open-file' to preview it."
   (let ((cb (current-buffer)))
     (save-excursion
@@ -53,16 +53,16 @@
         (let ((eww-point (point))
               (eww-window-start (window-start)))
           (with-current-buffer cb
-            (org-export-to-file 'html org-eww/htmlfilename nil nil nil nil nil #'eww-open-file))
+            (org-export-to-file 'html org-preview-html/htmlfilename nil nil nil nil nil #'eww-open-file))
           (goto-char eww-point)
           (set-window-start nil eww-window-start))))))
 
-(defun org-eww/turn-on-preview-on-save ()
+(defun org-preview-html/turn-on-preview-on-save ()
   "Turn on automatic preview of the current org file on save."
   (progn
-    (add-hook 'after-save-hook #'org-eww/preview nil t)
+    (add-hook 'after-save-hook #'org-preview-html/preview nil t)
     ;; temp filename into a buffer local variable
-    (setq-local org-eww/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html"))
+    (setq-local org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html"))
     ;; bogus file change to be able to save
     (insert " ")
     (delete-backward-char 1)
@@ -70,24 +70,24 @@
     (save-buffer)
     (message "Eww preview is on")))
 
-(defun org-eww/turn-off-preview-on-save ()
+(defun org-preview-html/turn-off-preview-on-save ()
   "Turn off automatic preview of the current org file on save."
   (progn
-    (remove-hook 'after-save-hook #'org-eww/preview t)
+    (remove-hook 'after-save-hook #'org-preview-html/preview t)
     (if (get-buffer "*eww*")
         (kill-buffer "*eww*"))
-    (if (boundp 'org-eww/htmlfilename) (delete-file org-eww/htmlfilename))
+    (if (boundp 'org-preview-html/htmlfilename) (delete-file org-preview-html/htmlfilename))
     (message "Eww preview is off")))
 
 ;;;###autoload
-(define-minor-mode org-eww-mode
+(define-minor-mode org-preview-html-mode
   "Preview current org file in eww whenever you save it."
   :init-value nil
   :lighter " eww-prev"
-  (if org-eww-mode
-      (org-eww/turn-off-preview-on-save)
-    (org-eww/turn-on-preview-on-save)))
+  (if org-preview-html-mode
+      (org-preview-html/turn-off-preview-on-save)
+    (org-preview-html/turn-on-preview-on-save)))
 
-(provide 'org-eww)
+(provide 'org-preview-html)
 
-;;; org-eww.el ends here
+;;; org-preview-html.el ends here
