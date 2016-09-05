@@ -12,10 +12,6 @@ org-preview-html-mode is a minor mode for Org-Mode that automatically use eww to
 
 * Usage
 
-Insert the following into your '.emacs' file:
-
-#+BEGIN_SRC elisp
-(add-hook 'org-mode-hook 'org-preview-html-mode)
-#+END_SRC
+Open an org-file and execute =M-x org-preview-html-mode=
 
 Then everytime org-file saved, an eww buffer will show the exported html.

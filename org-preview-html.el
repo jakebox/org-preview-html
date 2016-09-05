@@ -88,11 +88,12 @@
 ;;;###autoload
 (define-minor-mode org-preview-html-mode
   "Preview current org file in eww whenever you save it."
-  :init-value t
+  :init-value nil
   :lighter " eww-prev"
-  (if org-preview-html-mode
-      (org-preview-html/turn-off-preview-on-save)
-    (org-preview-html/turn-on-preview-on-save)))
+  (if (and (boundp org-preview-html-mode)
+           org-preview-html-mode)
+      (org-preview-html/turn-on-preview-on-save)
+    (org-preview-html/turn-off-preview-on-save)))
 
 (provide 'org-preview-html)
 
