@@ -37,10 +37,9 @@
 ;; Quick start:
 
 ;; Put this file under your load-path.
-;; Insert the following line in your `.emacs':
-;; (add-hook 'org-mode-hook 'org-preview-html-mode)
-;; Enable the org-preview-html-mode in your org buffer.
-
+;; Enable the org-preview-html-mode in your org buffer:
+;;   M-x org-preview-html-mode
+;;
 ;;; Code:
 (require 'org)
 (require 'eww)
