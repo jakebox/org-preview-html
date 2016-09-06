@@ -6,12 +6,31 @@
 
 * What is org-preview-html-mode
 
-org-preview-html-mode is a minor mode for Org-Mode that automatically use eww to preview current org-file on save.
+org-preview-html-mode is an Emacs minor mode for org mode that
+automatically uses the built-in eww browser to preview the current org
+file. The preview is updated every time the org file is saved.
 
 [[file:org-preview-html.gif]]
 
+* Installation
+
+This package is not (yet) in MELPA.
+
+You need to download it and place the org-preview-html.el file in a
+directory on your emacs load path and require it.
+
+The recommended, fully OS independent way to include a directory to
+your load path is to use this code:
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path
+               (concat user-emacs-directory
+                       (convert-standard-filename "elisp/")))
+#+END_SRC
+
 * Usage
 
-Open an org-file and execute =M-x org-preview-html-mode=
+Open an org file and execute =M-x org-preview-html-mode=. An eww preview
+window is shown next to the org file.
 
-Then everytime org-file saved, an eww buffer will show the exported html.
+Then every time the org file saved, the eww buffer is updated.
