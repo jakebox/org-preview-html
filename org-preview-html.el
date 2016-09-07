@@ -68,7 +68,7 @@
     (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html"))
     ;; bogus file change to be able to save
     (insert " ")
-    (delete-backward-char 1)
+    (delete-char -1)
     ;; trigger creation of preview buffer
     (save-buffer)
     (message "Eww preview is on")))
