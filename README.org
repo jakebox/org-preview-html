@@ -1,8 +1,9 @@
-#+TITLE: README
 #+AUTHOR: lujun9972
-#+CATEGORY: org-eww
+#+CATEGORY: org-preview-html
 #+DATE: [2015-12-27 日 10:53]
 #+OPTIONS: ^:{}
+
+[[http://melpa.org/packages/org-preview-html-badge.svg]]
 
 * What is org-preview-html-mode
 
@@ -14,13 +15,15 @@ file. The preview is updated every time the org file is saved.
 
 * Installation
 
-This package is not (yet) in MELPA.
+The preferred way of installing this package is using MELPA.
 
-You need to download it and place the org-preview-html.el file in a
-directory on your emacs load path and require it.
+If you want to do it in old fashioned way, download it and place the
+org-preview-html.el file in a directory on your emacs load path and
+require it.
 
 The recommended, fully OS independent way to include a directory to
-your load path is to use this code:
+your load path is to use this code with the appropriate directory
+name:
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path
