@@ -61,28 +61,27 @@
 
 (defun org-preview-html/turn-on-preview-on-save ()
   "Turn on automatic preview of the current org file on save."
-  (progn
-    (add-hook 'after-save-hook #'org-preview-html/preview nil t)
-    (add-hook 'kill-buffer-hook #'org-preview-html/turn-off-preview-on-save nil t)
-    ;; temp filename into a buffer local variable
-    (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html"))
-    ;; bogus file change to be able to save
-    (insert " ")
-    (delete-char -1)
-    ;; trigger creation of preview buffer
-    (save-buffer)
-    (message "Eww preview is on")))
+  (add-hook 'after-save-hook #'org-preview-html/preview nil t)
+  (add-hook 'kill-buffer-hook #'org-preview-html/turn-off-preview-on-save nil t)
+  ;; temp filename into a buffer local variable
+  (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html"))
+  ;; bogus file change to be able to save
+  (insert " ")
+  (delete-char -1)
+  ;; trigger creation of preview buffer
+  (save-buffer)
+  (message "Eww preview is on"))
 
 (defun org-preview-html/turn-off-preview-on-save ()
   "Turn off automatic preview of the current org file on save."
-  (progn
-    (remove-hook 'after-save-hook #'org-preview-html/preview t)
-    (remove-hook 'kill-buffer-hook #'org-preview-html/turn-off-preview-on-save t)
-    (if (get-buffer "*eww*")
-        (kill-buffer "*eww*"))
-    (if (and (boundp 'org-preview-html/htmlfilename)
-             org-preview-html/htmlfilename) (delete-file org-preview-html/htmlfilename))
-    (message "Eww preview is off")))
+  (remove-hook 'after-save-hook #'org-preview-html/preview t)
+  (remove-hook 'kill-buffer-hook #'org-preview-html/turn-off-preview-on-save t)
+  (if (get-buffer "*eww*")
+      (kill-buffer "*eww*"))
+  (if (and (boundp 'org-preview-html/htmlfilename)
+           org-preview-html/htmlfilename)
+      (delete-file org-preview-html/htmlfilename))
+  (message "Eww preview is off"))
 
 ;;;###autoload
 (define-minor-mode org-preview-html-mode
