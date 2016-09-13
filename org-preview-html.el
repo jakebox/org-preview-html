@@ -48,6 +48,7 @@
 (defvar-local org-preview-html/htmlfilename nil
   "The temp exported html file")
 
+;;;###autoload
 (defun org-preview-html/preview ()
   "Export current org-mode buffer to a temp file and call `eww-open-file' to preview it."
   (interactive)
