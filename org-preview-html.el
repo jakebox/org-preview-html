@@ -5,6 +5,7 @@
 ;; Author: DarkSun <lujun9972@gmail.com>
 ;; Created: 2015-12-27
 ;; Version: 0.2
+;; Package-Version: 20160905.2215
 ;; Keywords: convenience, eww, org
 ;; Package-Requires: ((org "8.0") (emacs "24.4"))
 ;; URL: https://github.com/lujun9972/org-preview-html
@@ -49,6 +50,10 @@
 
 (defun org-preview-html/preview ()
   "Export current org-mode buffer to a temp file and call `eww-open-file' to preview it."
+  (interactive)
+  ;; temp filename into a buffer local variable
+  (unless org-preview-html/htmlfilename
+    (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html")))
   (let ((cb (current-buffer)))
     (save-excursion
       (with-selected-window (display-buffer (get-buffer-create "*eww*"))
@@ -57,30 +62,30 @@
           (with-current-buffer cb
             (org-export-to-file 'html org-preview-html/htmlfilename nil nil nil nil nil #'eww-open-file))
           (goto-char eww-point)
-          (set-window-start nil eww-window-start))))))
+          (set-window-start nil eww-window-start)))))
+  (add-hook 'kill-buffer-hook #'org-preview-html//cleanning-the-preview nil t))
 
 (defun org-preview-html/turn-on-preview-on-save ()
   "Turn on automatic preview of the current org file on save."
   (add-hook 'after-save-hook #'org-preview-html/preview nil t)
-  (add-hook 'kill-buffer-hook #'org-preview-html/turn-off-preview-on-save nil t)
-  ;; temp filename into a buffer local variable
-  (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html"))
   ;; bogus file change to be able to save
   (insert " ")
-  (delete-char -1)
+  (delete-backward-char 1)
   ;; trigger creation of preview buffer
   (save-buffer)
   (message "Eww preview is on"))
 
-(defun org-preview-html/turn-off-preview-on-save ()
-  "Turn off automatic preview of the current org file on save."
-  (remove-hook 'after-save-hook #'org-preview-html/preview t)
-  (remove-hook 'kill-buffer-hook #'org-preview-html/turn-off-preview-on-save t)
+(defun org-preview-html//cleanning-the-preview ()
+  "Kill the preview buffer and delete the preview file"
   (if (get-buffer "*eww*")
       (kill-buffer "*eww*"))
   (if (and (boundp 'org-preview-html/htmlfilename)
-           org-preview-html/htmlfilename)
-      (delete-file org-preview-html/htmlfilename))
+           org-preview-html/htmlfilename) (delete-file org-preview-html/htmlfilename))
+  (remove-hook 'kill-buffer-hook #'org-preview-html//cleanning-the-preview t))
+
+(defun org-preview-html/turn-off-preview-on-save ()
+  "Turn off automatic preview of the current org file on save."
+  (remove-hook 'after-save-hook #'org-preview-html/preview t)
   (message "Eww preview is off"))
 
 ;;;###autoload
@@ -91,7 +96,8 @@
   (if (and (boundp org-preview-html-mode)
            org-preview-html-mode)
       (org-preview-html/turn-on-preview-on-save)
-    (org-preview-html/turn-off-preview-on-save)))
+    (org-preview-html/turn-off-preview-on-save)
+    (org-preview-html//cleanning-the-preview)))
 
 (provide 'org-preview-html)
 
