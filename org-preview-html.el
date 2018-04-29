@@ -54,7 +54,8 @@
   (interactive)
   ;; temp filename into a buffer local variable
   (unless org-preview-html/htmlfilename
-    (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html")))
+    ; (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html")))
+    (setq org-preview-html/htmlfilename (concat "/tmp/org_preview_html" (make-temp-name "-") ".html")))
   (let ((cb (current-buffer)))
     (save-excursion
       (with-selected-window (display-buffer (get-buffer-create "*eww*"))
