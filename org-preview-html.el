@@ -45,6 +45,9 @@
 (require 'org)
 (require 'eww)
 
+(defvar org-preview-html/body-only nil
+  "Scope the preview to the body or include the entire document.")
+
 (defvar-local org-preview-html/htmlfilename nil
   "The temp exported html file")
 
@@ -62,7 +65,7 @@
         (let ((eww-point (point))
               (eww-window-start (window-start)))
           (with-current-buffer cb
-            (org-export-to-file 'html org-preview-html/htmlfilename nil nil nil nil nil #'eww-open-file))
+            (org-export-to-file 'html org-preview-html/htmlfilename nil nil nil org-preview-html/body-only nil #'eww-open-file))
           (goto-char eww-point)
           (set-window-start nil eww-window-start)))))
   (add-hook 'kill-buffer-hook #'org-preview-html//cleanning-the-preview nil t))
