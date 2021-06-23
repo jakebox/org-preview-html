@@ -53,7 +53,7 @@
 
 ;;;###autoload
 (defun org-preview-html/preview ()
-  "Export current org-mode buffer to a temp file and call `eww-open-file' to preview it."
+  "Export current 'org-mode' buffer to a temp file and call `eww-open-file' to preview it."
   (interactive)
   ;; temp filename into a buffer local variable
   (unless org-preview-html/htmlfilename
@@ -79,13 +79,13 @@
   (add-hook 'after-save-hook #'org-preview-html/preview nil t)
   ;; bogus file change to be able to save
   (insert " ")
-  (delete-backward-char 1)
+  (delete-char -1)
   ;; trigger creation of preview buffer
   (save-buffer)
   (message "Eww preview is on"))
 
 (defun org-preview-html//cleanning-the-preview ()
-  "Kill the preview buffer and delete the preview file"
+  "Kill the preview buffer and delete the preview file."
   (if (get-buffer "*eww*")
       (kill-buffer "*eww*"))
   (if (and (boundp 'org-preview-html/htmlfilename)
