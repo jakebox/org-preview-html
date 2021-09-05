@@ -1,14 +1,13 @@
-;;; org-preview-html.el --- automatically use eww to preview the current org file on save
+;;; org-preview-html.el --- Automatically preview org-exported HTML files within Emacs -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2004-2016 DarkSun <lujun9972@gmail.com>
+;; Copyright (C) 2021 Jake B <jakebox.github.io>
 
-;; Author: DarkSun <lujun9972@gmail.com>
-;; Created: 2015-12-27
-;; Version: 0.2
-;; Package-Version: 20160905.2215
-;; Keywords: convenience, eww, org
-;; Package-Requires: ((org "8.0") (emacs "24.4"))
-;; URL: https://github.com/lujun9972/org-preview-html
+;; Author: Jake B <jakebox.github.io>
+;; Original author of org-preview-html (until 2021-09): DarkSun <lujun9972@gmail.com>
+;; Url: https://github.com/jakebox/org-preview-html
+;; Keywords: Org, convenience, outlines
+;; Version: 0.3
+;; Package-Requires: ((emacs "27.1") (org "8.0"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -16,97 +15,233 @@
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
-
+;;
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-
+;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;;
+;; This minor mode provides a side-by-side preview of your org-exported HTML
+;; files using the either the eww or xwidget browsers. The update frequency of
+;; the preview can be configured to suit your preference.
+;;
 
 ;;; Source code
 ;;
 ;; org-preview-html's code can be found here:
-;;   http://github.com/lujun9972/org-preview-html
+;;   http://github.com/jakebox/org-preview-html
 
-;;; Commentary:
-
-;; org-preview-html is a little tool that uses eww to automatically preview an
-;; org-file on save.
-
-;; Quick start:
-
-;; Put this file under your load-path.
-;; Enable the org-preview-html-mode in your org buffer:
+;;; Quick start:
+;; Put this file under your load path.
+;; Enable the minor mode in an Org buffer:
 ;;   M-x org-preview-html-mode
-;;
+;; Configure options with M-x customize-group org-preview-html
+
 ;;; Code:
+
+;;;; Requirements
 (require 'org)
+(require 'xwidget)
 (require 'eww)
 
-(defvar org-preview-html/body-only nil
-  "Scope the preview to the body or include the entire document.")
 
-(defvar-local org-preview-html/htmlfilename nil
-  "The temp exported html file")
+(defgroup org-preview-html nil
+  "Automatically preview org-exported HTML files within Emacs."
+  :group 'org-mode
+  :link '(url-link :tag "Homepage" "https://github.com/jakebox/org-preview-html/"))
 
-;;;###autoload
-(defun org-preview-html/preview ()
-  "Export current 'org-mode' buffer to a temp file and call `eww-open-file' to preview it."
+(defcustom org-preview-html-refresh-configuration 'save
+  "Specifies how often the HTML preview will be refreshed.
+  
+If 'manual, update manually by running `org-preview-html-refresh'.
+If 'save, update on save (default).
+If 'export, update on manual export \(using `org-html-export-to-html').
+If 'timer, update preview on timer ('org-preview-html-timer-interval').
+If 'instant, update ASAP (may cause slowdowns)."
+  :type '(choice
+		  (symbol :tag "Update preview manually."   'manual)
+		  (symbol :tag "Update preview on save."    'save)
+		  (symbol :tag "Update preview on export."  'export)
+		  (symbol :tag "Update preview on a timer." 'timer)
+		  (symbol :tag "Update preview instantly."  'instant))
+  :options '(save export timer instant)
+  :group 'org-preview-html)
+
+(defcustom org-preview-html-timer-interval 2
+  "Integer seconds to wait between exports when in 'timer mode."
+  :type 'integer
+  :group 'org-preview-html)
+
+(defcustom org-preview-html-viewer 'eww
+  "Which Emacs browser `org-preview-html-mode' will use.
+If 'eww, use eww browser (default).
+If 'xwidget, use xwidget browser."
+  :type 'symbol
+  :group 'org-preview-html)
+
+(defcustom org-preview-html-subtree-only nil
+  "If non-nil, scope the preview to the current subtree."
+  :type 'boolean
+  :group 'org-preview-html)
+
+(define-obsolete-variable-alias 'org-preview-html-subtree-only 'org-preview-html/body-only "Version 0.3")
+
+(defcustom org-preview-html/body-only nil
+  "Scope the preview to the body or include the entire document.
+Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
+  :type 'boolean
+  :group 'org-preview-html)
+
+
+(defvar org-preview-html--browser-buffer nil)
+(defvar org-preview-html--previewed-buffer-name nil)
+(defvar org-preview-html--refresh-timer nil)
+(defvar-local org-preview-html--html-file nil)
+
+
+;; https://emacs.stackexchange.com/questions/7116/pop-a-window-into-a-frame
+(defun org-preview-html-pop-window-to-frame ()
+  "Pop a window to a frame."
   (interactive)
-  ;; temp filename into a buffer local variable
-  (unless org-preview-html/htmlfilename
-    ; (setq org-preview-html/htmlfilename (concat buffer-file-name (make-temp-name "-") ".html")))
-    (setq org-preview-html/htmlfilename (concat  (if (or (string= system-type "ms-dos")
-                                                         (string= system-type "windows-nt"))
-                                                     (make-temp-name "org_preview_html-")
-                                                   (make-temp-name "/tmp/org_preview_html-"))
-                                                 ".html")))
-  (let ((cb (current-buffer)))
-    (save-excursion
-      (with-selected-window (display-buffer (get-buffer-create "*eww*"))
-        (let ((eww-point (point))
-              (eww-window-start (window-start)))
-          (with-current-buffer cb
-            (org-export-to-file 'html org-preview-html/htmlfilename nil nil nil org-preview-html/body-only nil #'eww-open-file))
-          (goto-char eww-point)
-          (set-window-start nil eww-window-start)))))
-  (add-hook 'kill-buffer-hook #'org-preview-html//cleanning-the-preview nil t))
+  (let ((buffer (current-buffer)))
+    (unless (one-window-p)
+      (delete-window))
+    (display-buffer-pop-up-frame buffer nil)))
 
-(defun org-preview-html/turn-on-preview-on-save ()
-  "Turn on automatic preview of the current org file on save."
-  (add-hook 'after-save-hook #'org-preview-html/preview nil t)
-  ;; bogus file change to be able to save
-  (insert " ")
-  (delete-char -1)
-  ;; trigger creation of preview buffer
-  (save-buffer)
-  (message "Eww preview is on"))
+(defun org-preview-html-refresh ()
+  "Exports the org file to HTML and refreshes the preview."
+  ;; Refresh the preview.
+  (interactive)
+  ;; WIP If in manual mode it doesn't matter what buffer is active, just export and refresh
+  (cond
+   ((eq org-preview-html-refresh-configuration 'manual) ;; if in manual mode
+		 (pop-to-buffer org-preview-html--previewed-buffer-name nil t)
+		 (org-preview-html--org-export-html)
+		 (org-preview-html--reload-preview))
+		((unless (or (eq (eq (get-buffer org-preview-html--previewed-buffer-name) ;; TODO JAKE WHAT IS THIS
+                             ;; In timer and instant modes the visible buffer matters
+							 (window-buffer (selected-window))) nil)
+					 (or (let ((state org-preview-html-refresh-configuration))
+						   (eq state 'timer) (eq state 'instant))))
+		   (org-preview-html--org-export-html)
+		   (org-preview-html--reload-preview)))))
 
-(defun org-preview-html//cleanning-the-preview ()
-  "Kill the preview buffer and delete the preview file."
-  (if (get-buffer "*eww*")
-      (kill-buffer "*eww*"))
-  (if (and (boundp 'org-preview-html/htmlfilename)
-           org-preview-html/htmlfilename) (delete-file org-preview-html/htmlfilename))
-  (remove-hook 'kill-buffer-hook #'org-preview-html//cleanning-the-preview t))
+(defun org-preview-html--org-export-html ()
+  "Silently export org to HTML."
+  (let ((standard-output 'ignore))
+	(org-export-to-file 'html (substring org-preview-html--html-file 7)
+	  nil org-preview-html-subtree-only nil nil nil nil)))
 
-(defun org-preview-html/turn-off-preview-on-save ()
-  "Turn off automatic preview of the current org file on save."
-  (remove-hook 'after-save-hook #'org-preview-html/preview t)
-  (message "Eww preview is off"))
+(defun org-preview-html--reload-preview ()
+  "Reload preview."
+  (save-selected-window
+	(pop-to-buffer org-preview-html--browser-buffer)
+	(cond ((eq org-preview-html-viewer 'xwidget) (xwidget-webkit-reload))
+		  ((eq org-preview-html-viewer 'eww)
+		   (with-selected-window (selected-window)
+			 ;; This stuff is to keep eww window scrolled at same point
+			 (let ((eww-point (point))
+				   (eww-window-start (window-start)))
+			   (eww-reload)
+			   (goto-char eww-point)
+			   (set-window-start nil eww-window-start)))))))
+
+(defun org-preview-html--kill-preview-buffer ()
+  "Kill the xwidget preview buffer and pop back to the previewed org buffer."
+  ;; Only do these things if the preview is around
+  (when (bound-and-true-p org-preview-html--browser-buffer)
+    ;; If preview is visible we first delete the window, otherwise
+	;; just kill the preview buffer
+	(if (get-buffer-window org-preview-html--browser-buffer 'visible)
+		(delete-window (get-buffer-window org-preview-html--browser-buffer)))
+	(let ((kill-buffer-query-functions nil))
+	  (kill-buffer org-preview-html--browser-buffer))
+	(pop-to-buffer org-preview-html--previewed-buffer-name)))
+
+(defun org-preview-html--run-with-timer ()
+  "Configure timer to refresh preview for `timer' mode."
+  (setq org-preview-html--refresh-timer
+		(run-at-time 1 org-preview-html-timer-interval #'org-preview-html-refresh)))
+
+(defun org-preview-html--config ()
+  "Configure buffer for preview: add exit hooks; configure refresh hooks."
+  (setq org-preview-html--previewed-buffer-name (buffer-name))
+  (dolist (hook '(kill-buffer-hook kill-emacs-hook)) ;; Configure exit hooks
+    (add-hook hook #'org-preview-html--stop-preview nil t))
+  (let ((conf org-preview-html-refresh-configuration))
+	(cond
+	 ((eq conf 'manual))
+	 ((eq conf 'save) ;; On save
+	  (add-hook 'after-save-hook #'org-preview-html-refresh nil t))
+	 ((eq conf 'timer) ;; every X seconds
+	  (org-preview-html--run-with-timer))
+	 ((eq conf 'export) ;; On export using org-html-export-html command manually
+	  (advice-add 'org-html-export-to-html :after #'org-preview-html--reload-preview))
+	 ((eq conf 'instant) ;; WIP Instantly (on self insert refresh)
+	  (add-hook 'post-self-insert-hook #'org-preview-html-refresh nil t)))))
+
+(defun org-preview-html--unconfig ()
+  "Unconfigure 'org-preview-html-mode' (remove hooks and advice)."
+  (let ((conf org-preview-html-refresh-configuration))
+	(cond ((eq conf 'instant) ;; WIP
+		   (remove-hook 'post-self-insert-hook #'org-preview-html-refresh t))
+		  ((eq conf 'save)
+		   (remove-hook 'after-save-hook #'org-preview-html-refresh t))
+		  ((eq conf 'timer)
+		   (cancel-timer org-preview-html--refresh-timer))
+		  ((eq conf 'export)
+		   (advice-remove 'org-html-export-to-html #'org-preview-html--reload-preview))))
+  (dolist (hook '(kill-buffer-hook kill-emacs-hook)) ;; Remove hooks
+    (remove-hook hook #'org-preview-html--stop-preview t))
+  ;; Reset variables
+  (dolist (var '(org-preview-html--browser-buffer org-preview-html--previewed-buffer-name))
+	(set var nil)))
+
+(defun org-preview-html--open-browser ()
+  "Open a browser to preview the exported HTML file."
+  ;; Store the exported HTML filename
+  (setq-local org-preview-html--html-file (concat (file-name-sans-extension
+												   (concat "file://" buffer-file-name)) ".html"))
+  (unless (file-exists-p org-preview-html--html-file)
+	(org-preview-html--org-export-html)) ;; Unless the file already exists, export it
+  ;; Procedure to open the side-by-side preview
+  (split-window-right)
+  (other-window 1)
+  (let ((file org-preview-html--html-file))
+	(cond ((eq org-preview-html-viewer 'xwidget) (xwidget-webkit-browse-url file))
+		  ((eq org-preview-html-viewer 'eww) (eww-browse-url file))))
+  (setq org-preview-html--browser-buffer (get-buffer (buffer-name)))
+  (previous-window-any-frame))
+
+(defun org-preview-html--start-preview ()
+  "Begin the org-preview-html preview."
+  (when buffer-file-name
+	(cond ((derived-mode-p 'org-mode)
+		   (message "org-preview-html has recieved a major update - xwidgets support, refresh configurations and more! \n M-x customize-group org-preview-html-mode")
+		   (org-preview-html--open-browser)
+		   (org-preview-html--config))
+		  (t
+		   (org-preview-html-mode -1)
+		   (user-error "`%s' not supported by org-preview-html preview, only `org mode'!" major-mode)))))
+
+(defun org-preview-html--stop-preview ()
+  "Stop the org-preview-html preview."
+  (org-preview-html--kill-preview-buffer)
+  (org-preview-html--unconfig))
+
 
 ;;;###autoload
 (define-minor-mode org-preview-html-mode
-  "Preview current org file in eww whenever you save it."
-  :init-value nil
-  :lighter " eww-prev"
-  (if (and (boundp org-preview-html-mode)
-           org-preview-html-mode)
-      (org-preview-html/turn-on-preview-on-save)
-    (org-preview-html/turn-off-preview-on-save)
-    (org-preview-html//cleanning-the-preview)))
+  "(Optionally) live preview for Org exports to HTML."
+  :lighter " org-preview-html"
+  (if org-preview-html-mode
+      (org-preview-html--start-preview)
+    (org-preview-html--stop-preview)))
 
 (provide 'org-preview-html)
 

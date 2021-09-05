@@ -1,39 +1,51 @@
-#+AUTHOR: lujun9972
-#+CATEGORY: org-preview-html
-#+DATE: [2015-12-27 日 10:53]
-#+OPTIONS: ^:{}
+#+TITLE: org-preview-html
+#+AUTHOR: jakebox
+#+OPTIONS: num:nil toc:nil ^:{} 
 
 [[http://melpa.org/packages/org-preview-html-badge.svg]]
 
-* What is org-preview-html-mode
-
-org-preview-html-mode is an Emacs minor mode for org mode that
-automatically uses the built-in eww browser to preview the current org
-file. The preview is updated every time the org file is saved.
-
-[[file:org-preview-html.gif]]
+This minor mode provides an easy preview of your org-exported HTML files using either the =eww= or =xwidget WebKit= browser. By default, when =org-preview-html-mode= is enabled a save will trigger a refresh of the preview. Refresh frequency can be configured using ~org-preview-html-refresh-configuration~ (see [[#usage][Usage]]).
 
 * Installation
+** MELPA
+The preferred way of installing this package is using MELPA. ~M-x package-install org-preview-html~.
 
-The preferred way of installing this package is using MELPA.
-
-If you want to do it in old fashioned way, download it and place the
-org-preview-html.el file in a directory on your emacs load path and
-require it.
-
-The recommended, fully OS independent way to include a directory to
-your load path is to use this code with the appropriate directory
-name:
-
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path
-               (concat user-emacs-directory
-                       (convert-standard-filename "elisp/")))
-#+END_SRC
+** Manual
+Download and copy =org-preview-html.el= into a directory in your load-path then ~(require 'org-preview-html)~.
 
 * Usage
+Open an Org file and execute ~M-x org-preview-html-mode~. A preview window opens next to the Org file. If you want to manage this window separate (aka, make it a frame) use the function ~org-preview-html-pop-window-to-frame~.
+** Commands
++ ~org-preview-html-mode~ - enables minor mode and opens preview.
++ ~org-preview-html-refresh~ - manually refresh preview (only needed in ~manual~ mode).
++ ~org-preview-html-pop-window-to-frame~ - pops out the current window in to a frame.
+  
+* Variables/Configuration
+** Refresh Configuration
++ ~org-preview-html-refresh-configuration~ - configure how often the HTML preview will be refreshed
+  * If ~'manual~, update manually by running ~org-preview-html-refresh~.
+  * If ~'save~, update on save (default).
+  * If ~'export~, update on manual export (using ~org-html-export-to-html~).
+  * If ~'timer~, update preview on timer.
+    - Configure with ~org-preview-html-timer-interval~, default ~2~ seconds.
+  * If ~'instant~, update ASAP
+    - Still WIP, it is suggested to use ~timer~ mode with a short interval.
+** Viewer
++ ~org-preview-html-viewer~ - which Emacs browser ~org-preview-html-mode~ will use (default ~eww~)
+  * If ~'eww~, use eww browser (default).
+  * If ~'xwidget~, use xwidget browser.
+    - *Requires Emacs to be built with xwidget support*
+      
+* Demo
+This demo is using the =xwidget= browser. The author suggests utilizing the =xwidget= browser, though =eww= is set as default for the comfort of past users.
+[[org-preview-html-demo.gif]]
 
-Open an org file and execute =M-x org-preview-html-mode=. An eww preview
-window is shown next to the org file.
+* Limitations
+It should be noted that as of now =org-preview-html-mode= officially supports previewing only one buffer at a time. Any suggestions on how previewing multiple buffers would work are welcome. It would be fairly trivial to implement preview support without any nice automatic switching/saving features; however, I would rather implement a smooth, pleasant experience rather than a janky one.
 
-Then every time the org file saved, the eww buffer is updated.
+* Todos
++ Improve ~instant~ mode
++ Auto-jump to current position in preview
+
+* Credits
+Org-preview-html was originally written by [[https://github.com/lujun9972][lujun9972 (Darksun)]]. It was rewritten by its current maintainer, [[https://github.com/jakebox][jakebox]]. A thank you is due to Darksun for his long-time support and commitment.
