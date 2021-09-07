@@ -23,17 +23,17 @@ Open an Org file and execute ~M-x org-preview-html-mode~. A preview window opens
 * Variables/Configuration
 ** Refresh Configuration
 + ~org-preview-html-refresh-configuration~ - configure how often the HTML preview will be refreshed
-  * If ~'manual~, update manually by running ~org-preview-html-refresh~.
-  * If ~'save~, update on save (default).
-  * If ~'export~, update on manual export (using ~org-html-export-to-html~).
-  * If ~'timer~, update preview on timer.
+  * If ~‌'manual~, update manually by running ~org-preview-html-refresh~.
+  * If ~‌'save~, update on save (default).
+  * If ~‌'export~, update on manual export (using ~org-html-export-to-html~).
+  * If ~‌'timer~, update preview on timer.
     - Configure with ~org-preview-html-timer-interval~, default ~2~ seconds.
-  * If ~'instant~, update ASAP
+  * If ~‌'instant~, update ASAP
     - Still WIP, it is suggested to use ~timer~ mode with a short interval.
 ** Viewer
 + ~org-preview-html-viewer~ - which Emacs browser ~org-preview-html-mode~ will use (default ~eww~)
-  * If ~'eww~, use eww browser (default).
-  * If ~'xwidget~, use xwidget browser.
+  * If ~‌'eww~, use eww browser (default).
+  * If ~‌'xwidget~, use xwidget browser.
     - *Requires Emacs to be built with xwidget support*
       
 * Demo
@@ -48,4 +48,4 @@ It should be noted that as of now =org-preview-html-mode= officially supports pr
 + Auto-jump to current position in preview
 
 * Credits
-Org-preview-html was originally written by [[https://github.com/lujun9972][lujun9972 (Darksun)]]. It was rewritten by its current maintainer, [[https://github.com/jakebox][jakebox]]. A thank you is due to Darksun for his long-time support and commitment.
+Org-preview-html was originally written by [[https://github.com/lujun9972][lujun9972 (Darksun)]] and was originally titled (long ago) org-eww. It was rewritten by its current maintainer, [[https://github.com/jakebox][jakebox]]. A thank you is due to Darksun for his long-time support and commitment.
