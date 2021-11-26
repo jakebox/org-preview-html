@@ -55,18 +55,17 @@
 (defcustom org-preview-html-refresh-configuration 'save
   "Specifies how often the HTML preview will be refreshed.
   
-If 'manual, update manually by running `org-preview-html-refresh'.
-If 'save, update on save (default).
-If 'export, update on manual export \(using `org-html-export-to-html').
-If 'timer, update preview on timer ('org-preview-html-timer-interval').
-If 'instant, update ASAP (may cause slowdowns)."
+If `manual', update manually by running `org-preview-html-refresh'.
+If `save', update on save (default).
+If `export', update on manual export \(using `org-html-export-to-html').
+If `timer', update preview on timer (`org-preview-html-timer-interval').
+If `instant', update ASAP (may cause slowdowns)."
   :type '(choice
-		  (symbol :tag "Update preview manually."   'manual)
-		  (symbol :tag "Update preview on save."    'save)
-		  (symbol :tag "Update preview on export."  'export)
-		  (symbol :tag "Update preview on a timer." 'timer)
-		  (symbol :tag "Update preview instantly."  'instant))
-  :options '(save export timer instant)
+		  (symbol :tag "Update preview manually"   manual)
+		  (symbol :tag "Update preview on save"    save)
+		  (symbol :tag "Update preview on export"  export)
+		  (symbol :tag "Update preview on a timer" timer)
+		  (symbol :tag "Update preview instantly"  instant))
   :group 'org-preview-html)
 
 (defcustom org-preview-html-timer-interval 2
@@ -76,17 +75,20 @@ If 'instant, update ASAP (may cause slowdowns)."
 
 (defcustom org-preview-html-viewer 'eww
   "Which Emacs browser `org-preview-html-mode' will use.
-If 'eww, use eww browser (default).
-If 'xwidget, use xwidget browser."
-  :type 'symbol
+
+If `eww', use eww browser (default).
+If `xwidget', use xwidget browser."
+  :type '(choice
+		  (symbol :tag "Use eww"      eww)
+		  (symbol :tag "Use xwidget"  xwidget))
   :group 'org-preview-html)
+
+(define-obsolete-variable-alias 'org-preview-html/body-only 'org-preview-html-subtree-only "Version 0.3")
 
 (defcustom org-preview-html-subtree-only nil
   "If non-nil, scope the preview to the current subtree."
   :type 'boolean
   :group 'org-preview-html)
-
-(define-obsolete-variable-alias 'org-preview-html-subtree-only 'org-preview-html/body-only "Version 0.3")
 
 (defcustom org-preview-html/body-only nil
   "Scope the preview to the body or include the entire document.
@@ -95,6 +97,7 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
   :group 'org-preview-html)
 
 
+;; Internal variables
 (defvar org-preview-html--browser-buffer nil)
 (defvar org-preview-html--previewed-buffer-name nil)
 (defvar org-preview-html--refresh-timer nil)
