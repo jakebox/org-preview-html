@@ -214,16 +214,15 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
 (defun org-preview-html--open-browser ()
   "Open a browser to preview the exported HTML file."
   ;; Store the exported HTML filename
-  (setq-local org-preview-html--html-file (concat (file-name-sans-extension
-												   (concat "file://" buffer-file-name)) ".html"))
+  (setq-local org-preview-html--html-file (concat (file-name-sans-extension buffer-file-name) ".html"))
   (unless (file-exists-p org-preview-html--html-file)
 	(org-preview-html--org-export-html)) ;; Unless the file already exists, export it
   ;; Procedure to open the side-by-side preview
   (split-window-right)
   (other-window 1)
   (let ((file org-preview-html--html-file))
-	(cond ((eq org-preview-html-viewer 'xwidget) (xwidget-webkit-browse-url file))
-		  ((eq org-preview-html-viewer 'eww) (eww-browse-url file))))
+	(cond ((eq org-preview-html-viewer 'xwidget) (xwidget-webkit-browse-url (concat "file://" file)))
+		  ((eq org-preview-html-viewer 'eww) (eww-open-file file))))
   (setq org-preview-html--browser-buffer (get-buffer (buffer-name)))
   (org-preview-html--previous-window-any-frame))
 
