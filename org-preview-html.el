@@ -143,7 +143,7 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
 (defun org-preview-html--org-export-html ()
   "Silently export org to HTML."
   (let ((standard-output 'ignore))
-	(org-export-to-file 'html (substring org-preview-html--html-file 7)
+	(org-export-to-file 'html org-preview-html--html-file
 	  nil org-preview-html-subtree-only nil nil nil nil)))
 
 (defun org-preview-html--reload-preview ()
