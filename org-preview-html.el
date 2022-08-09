@@ -58,14 +58,12 @@
 If `manual', update manually by running `org-preview-html-refresh'.
 If `save', update on save (default).
 If `export', update on manual export \(using `org-html-export-to-html').
-If `timer', update preview on timer (`org-preview-html-timer-interval').
-If `instant', update ASAP (may cause slowdowns)."
+If `timer', update preview on timer (`org-preview-html-timer-interval')."
   :type '(choice
 		  (symbol :tag "Update preview manually"   manual)
 		  (symbol :tag "Update preview on save"    save)
 		  (symbol :tag "Update preview on export"  export)
-		  (symbol :tag "Update preview on a timer" timer)
-		  (symbol :tag "Update preview instantly"  instant))
+		  (symbol :tag "Update preview on a timer" timer))
   :group 'org-preview-html)
 
 (defcustom org-preview-html-timer-interval 2
@@ -121,24 +119,13 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
 				  0))
   (select-frame-set-input-focus (selected-frame)))
 
-
 (defun org-preview-html-refresh ()
   "Exports the org file to HTML and refreshes the preview."
-  ;; Refresh the preview.
   (interactive)
-  ;; WIP If in manual mode it doesn't matter what buffer is active, just export and refresh
-  (cond
-   ((eq org-preview-html-refresh-configuration 'manual) ;; if in manual mode
-		 (pop-to-buffer org-preview-html--previewed-buffer-name nil t)
-		 (org-preview-html--org-export-html)
-		 (org-preview-html--reload-preview))
-		((unless (or (eq (eq (get-buffer org-preview-html--previewed-buffer-name) ;; TODO JAKE WHAT IS THIS
-                             ;; In timer and instant modes the visible buffer matters
-							 (window-buffer (selected-window))) nil)
-					 (or (let ((state org-preview-html-refresh-configuration))
-						   (eq state 'timer) (eq state 'instant))))
-		   (org-preview-html--org-export-html)
-		   (org-preview-html--reload-preview)))))
+  (when (eq org-preview-html-refresh-configuration 'manual)
+ 	(pop-to-buffer org-preview-html--previewed-buffer-name nil t))
+  (org-preview-html--org-export-html)
+  (org-preview-html--reload-preview))
 
 (defun org-preview-html--org-export-html ()
   "Silently export org to HTML."
@@ -190,16 +177,12 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
 	 ((eq conf 'timer) ;; every X seconds
 	  (org-preview-html--run-with-timer))
 	 ((eq conf 'export) ;; On export using org-html-export-html command manually
-	  (advice-add 'org-html-export-to-html :after #'org-preview-html--reload-preview))
-	 ((eq conf 'instant) ;; WIP Instantly (on self insert refresh)
-	  (add-hook 'post-self-insert-hook #'org-preview-html-refresh nil t)))))
+	  (advice-add 'org-html-export-to-html :after #'org-preview-html--reload-preview)))))
 
 (defun org-preview-html--unconfig ()
   "Unconfigure 'org-preview-html-mode' (remove hooks and advice)."
   (let ((conf org-preview-html-refresh-configuration))
-	(cond ((eq conf 'instant) ;; WIP
-		   (remove-hook 'post-self-insert-hook #'org-preview-html-refresh t))
-		  ((eq conf 'save)
+	(cond ((eq conf 'save)
 		   (remove-hook 'after-save-hook #'org-preview-html-refresh t))
 		  ((eq conf 'timer)
 		   (cancel-timer org-preview-html--refresh-timer))
