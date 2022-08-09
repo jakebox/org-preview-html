@@ -6,7 +6,7 @@
 ;; Original author of org-preview-html (until 2021-09): DarkSun <lujun9972@gmail.com>
 ;; Url: https://github.com/jakebox/org-preview-html
 ;; Keywords: Org, convenience, outlines
-;; Version: 0.3
+;; Version: 0.3.1
 ;; Package-Requires: ((emacs "25.1") (org "8.0"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -148,7 +148,7 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
 			   (set-window-start nil eww-window-start)))))))
 
 (defun org-preview-html--kill-preview-buffer ()
-  "Kill the xwidget preview buffer and pop back to the previewed org buffer."
+  "Kill the preview buffer and pop back to the previewed org buffer."
   ;; Only do these things if the preview is around
   (when (bound-and-true-p org-preview-html--browser-buffer)
     ;; If preview is visible we first delete the window, otherwise
@@ -198,8 +198,7 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
   "Open a browser to preview the exported HTML file."
   ;; Store the exported HTML filename
   (setq-local org-preview-html--html-file (concat (file-name-sans-extension buffer-file-name) ".html"))
-  (unless (file-exists-p org-preview-html--html-file)
-	(org-preview-html--org-export-html)) ;; Unless the file already exists, export it
+  (org-preview-html--org-export-html)) ;; Export the org file to HTML
   ;; Procedure to open the side-by-side preview
   (split-window-right)
   (other-window 1)
