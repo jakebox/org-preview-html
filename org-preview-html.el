@@ -198,7 +198,7 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
   "Open a browser to preview the exported HTML file."
   ;; Store the exported HTML filename
   (setq-local org-preview-html--html-file (concat (file-name-sans-extension buffer-file-name) ".html"))
-  (org-preview-html--org-export-html)) ;; Export the org file to HTML
+  (org-preview-html--org-export-html) ;; Export the org file to HTML
   ;; Procedure to open the side-by-side preview
   (split-window-right)
   (other-window 1)
