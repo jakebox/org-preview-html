@@ -139,13 +139,16 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
 	(pop-to-buffer org-preview-html--browser-buffer)
 	(cond ((eq org-preview-html-viewer 'xwidget) (xwidget-webkit-reload))
 		  ((eq org-preview-html-viewer 'eww)
-		   (with-selected-window (selected-window)
-			 ;; This stuff is to keep eww window scrolled at same point
-			 (let ((eww-point (point))
-				   (eww-window-start (window-start)))
-			   (eww-reload)
-			   (goto-char eww-point)
-			   (set-window-start nil eww-window-start)))))))
+           ;; Rough patch for reload not behaving in eww on mingw32
+           (if (string-match-p "mingw32" system-configuration)
+               (eww-open-file org-preview-html--html-file)
+		     (with-selected-window (selected-window)
+			   ;; This stuff is to keep eww window scrolled at same point
+			   (let ((eww-point (point))
+				     (eww-window-start (window-start)))
+			     (eww-reload)
+			     (goto-char eww-point)
+			     (set-window-start nil eww-window-start))))))))
 
 (defun org-preview-html--kill-preview-buffer ()
   "Kill the preview buffer and pop back to the previewed org buffer."
