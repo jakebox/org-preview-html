@@ -1,3 +1,4 @@
+
 #+TITLE: org-preview-html
 #+AUTHOR: jakebox
 #+OPTIONS: num:nil toc:nil ^:{} 
@@ -42,6 +43,9 @@ This demo is using the =xwidget= browser. The author suggests utilizing the =xwi
 
 * Limitations
 It should be noted that as of now =org-preview-html-mode= officially supports previewing only one buffer at a time. Any suggestions on how previewing multiple buffers would work are welcome. It would be fairly trivial to implement preview support without any nice automatic switching/saving features; however, I would rather implement a smooth, pleasant experience rather than a janky one.
+
+** Graphviz reload
+User reports that =eww= and =graphviz= do not behave nicely together. Thank you to [[https://github.com/wmedrano][wmedrano]] for this note, check out [[https://github.com/jakebox/org-preview-html/issues/23][#23.]]
 
 * Todos
 + Improve ~instant~ mode
