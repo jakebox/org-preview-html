@@ -94,6 +94,13 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
   :type 'boolean
   :group 'org-preview-html)
 
+(defcustom org-preview-html-mingw-workaround nil
+  "Enable EWW reload workaround for Emacs on MinGW.
+Set this to t if you are using Emacs on mingw32 and the
+normal EWW reload does not behave correctly."
+  :type 'boolean
+  :group 'org-preview-html)
+
 
 ;; Internal variables
 (defvar org-preview-html--browser-buffer nil)
@@ -119,6 +126,12 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
 				  0))
   (select-frame-set-input-focus (selected-frame)))
 
+(defun org-preview-html--mingw-p ()
+  "Return non-nil if running on a MinGW build or workaround flag is set."
+  (or org-preview-html-mingw-workaround
+      (and (stringp system-configuration)
+           (string-match-p "mingw32" system-configuration))))
+
 (defun org-preview-html-refresh ()
   "Exports the org file to HTML and refreshes the preview."
   (interactive)
@@ -140,7 +153,7 @@ Obselete as of version 0.3, instead use `org-preview-html-subtree-only'."
 	(cond ((eq org-preview-html-viewer 'xwidget) (xwidget-webkit-reload))
 		  ((eq org-preview-html-viewer 'eww)
            ;; Rough patch for reload not behaving in eww on mingw32
-           (if (string-match-p "mingw32" system-configuration)
+           (if (org-preview-html--mingw-p)
                (eww-open-file org-preview-html--html-file)
 		     (with-selected-window (selected-window)
 			   ;; This stuff is to keep eww window scrolled at same point
