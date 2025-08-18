@@ -129,7 +129,7 @@ normal EWW reload does not behave correctly."
 (defun org-preview-html--mingw-p ()
   "Return non-nil if running on a MinGW build or workaround flag is set."
   (or org-preview-html-mingw-workaround
-      (and (stringp system-configuration)
+      (and (boundp 'system-configuration)
            (string-match-p "mingw32" system-configuration))))
 
 (defun org-preview-html-refresh ()
